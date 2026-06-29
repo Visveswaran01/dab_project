@@ -26,18 +26,18 @@ targets:
       host: https://adb-7405606524101174.14.azuredatabricks.net
     variables:
       catalog: citibike_dev
-      schema: ${workspace.current_user.short_name}
     presets:
       artifacts_dynamic_version: true
   prod:
     mode: production
     workspace:
-      host: https://adb-7405606524101174.14.azuredatabricks.net
+      host: https://adb-7405612707430150.10.azuredatabricks.net/
       # We explicitly deploy to /Workspace/Users/vb@mngenvmcap464197.onmicrosoft.com to make sure we only have a single copy.
-      root_path: /Workspace/Users/vb@mngenvmcap464197.onmicrosoft.com/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/Shared/.bundle/${bundle.name}/${bundle.target}
     variables:
-      catalog: viswa_dbks_dev
-      schema: prod
+      catalog: citibike_dev
     permissions:
-      - user_name: vb@mngenvmcap464197.onmicrosoft.com
+      - service_principal_name: 0eb115b1-9929-46d0-ae2e-e442378f9051
         level: CAN_MANAGE
+    run_as:
+      service_principal_name: 0eb115b1-9929-46d0-ae2e-e442378f9051
