@@ -13,7 +13,9 @@ resources:
               processed_at: "{{job.start_time.iso_datetime}}"
               catalog: "${var.catalog}"
             source: WORKSPACE
-          existing_cluster_id: 0622-191418-q3j4m6y3
+          # Force Serverless by declaring an empty new_cluster block
+          new_cluster: {}
+
         - task_key: Silver_Layer
           depends_on:
             - task_key: Bronze_Layer
@@ -26,7 +28,8 @@ resources:
               processed_at: "{{job.start_time.iso_datetime}}"
               catalog: "${var.catalog}"
             source: WORKSPACE
-          existing_cluster_id: 0622-191418-q3j4m6y3
+          new_cluster: {}
+
         - task_key: Gold_Layer_daily_summary
           depends_on:
             - task_key: Silver_Layer
@@ -35,7 +38,8 @@ resources:
             base_parameters:
               catalog: "${var.catalog}"
             source: WORKSPACE
-          existing_cluster_id: 0622-191418-q3j4m6y3
+          new_cluster: {}
+
         - task_key: Gold_Layer_station_summary
           depends_on:
             - task_key: Silver_Layer
@@ -44,6 +48,6 @@ resources:
             base_parameters:
               catalog: "${var.catalog}"
             source: WORKSPACE
-          existing_cluster_id: 0622-191418-q3j4m6y3
+          new_cluster: {}
       queue:
         enabled: true
