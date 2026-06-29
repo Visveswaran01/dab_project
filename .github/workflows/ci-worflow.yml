@@ -1,0 +1,44 @@
+name: CI Workflow
+
+on:
+  push:
+    branches:
+      - Feature-BranchA
+  pull_request: 
+    branches:
+      - main
+
+jobs:
+  ci_job:
+    name: CI Job
+    runs-on: ubuntu-latest
+    #environment: Prod
+
+    steps:
+    
+      - name: Checkout code
+        uses: actions/checkout@v7
+      
+      - name: Install Python version 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Databricks CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+
+      # - name: Create Databricks configuration profile file instead of CLI Command
+      #   run: |
+      #     echo "[DEFAULT]" > ~/.databrickscfg
+      #     echo "host = ${{ secrets.DATABRICKS_PROD_HOST }}" >> ~/.databrickscfg
+      #     echo "token = ${{ secrets.DATABRICKS_PROD_PAT }}" >> ~/.databrickscfg
+      
+      # - name: View Databricks config file
+      #   run: |
+      #     cat ~/.databrickscfg
