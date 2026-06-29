@@ -12,7 +12,7 @@ jobs:
   ci_job:
     name: CI Job
     runs-on: ubuntu-latest
-    #environment: Prod
+    environment: prod
 
     steps:
     
@@ -33,12 +33,21 @@ jobs:
         run: |
           curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
 
-      # - name: Create Databricks configuration profile file instead of CLI Command
-      #   run: |
-      #     echo "[DEFAULT]" > ~/.databrickscfg
-      #     echo "host = ${{ secrets.DATABRICKS_PROD_HOST }}" >> ~/.databrickscfg
-      #     echo "token = ${{ secrets.DATABRICKS_PROD_PAT }}" >> ~/.databrickscfg
+      - name: Create Databricks configuration profile file instead of CLI Command
+        run: |
+          echo "[PROD]" > ~/.databrickscfg
+          echo "host = ${{ secrets.HOST }}" >> ~/.databrickscfg
+          echo "azure_tenant_id = ${{secrets.AZURE_TENANT_ID}}" >> ~/.databrickscfg
+          echo "azure_client_id = ${{secrets.AZURE_CLIENT_ID}}" >> ~/.databrickscfg
+          echo "azure_client_secret = ${{secrets.AZURE_CLIENT_SECRET}}" >> ~/.databrickscfg
       
-      # - name: View Databricks config file
-      #   run: |
-      #     cat ~/.databrickscfg
+      - name: View Databricks config file
+        run: |
+           cat ~/.databrickscfg
+
+      - name: Deploy To Prod
+        run: |
+          databricks bundle deploy \
+          --target PROD \
+          --profile PROD
+      
