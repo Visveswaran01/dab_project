@@ -2,60 +2,58 @@ resources:
   jobs:
     citibike_etl_pipeline_nb:
       name: citibike_etl_pipeline_nb
-      
-      # 1. Define a modern, standard Job Cluster block but leave it completely empty ({})
-      # This explicitly tells the API backend to route everything to pure Serverless infra.
-      job_clusters:
-        - job_cluster_key: serverless_job_compute
-          new_cluster: {}
 
       tasks:
         - task_key: Bronze_Layer
           notebook_task:
             notebook_path: ../citibike_etl/notebooks/01_bronze/bronze_citibike.ipynb
+            source: WORKSPACE
             base_parameters:
               pipelineid: "{{job.id}}"
               runid: "{{job.run_id}}"
               task_id: "{{task.run_id}}"
               processed_at: "{{job.start_time.iso_datetime}}"
               catalog: "${var.catalog}"
-            source: WORKSPACE
-          # 2. Point your task to the empty cluster configuration key
-          job_cluster_key: serverless_job_compute
+          environment_key: default
 
         - task_key: Silver_Layer
           depends_on:
             - task_key: Bronze_Layer
           notebook_task:
             notebook_path: ../citibike_etl/notebooks/02_silver/silver_citibike.ipynb
+            source: WORKSPACE
             base_parameters:
               pipelineid: "{{job.id}}"
               runid: "{{job.run_id}}"
               task_id: "{{task.run_id}}"
               processed_at: "{{job.start_time.iso_datetime}}"
               catalog: "${var.catalog}"
-            source: WORKSPACE
-          job_cluster_key: serverless_job_compute
+          environment_key: default
 
         - task_key: Gold_Layer_daily_summary
           depends_on:
             - task_key: Silver_Layer
           notebook_task:
             notebook_path: ../citibike_etl/notebooks/03_gold/gold_citibike_daily_ride_summary.ipynb
+            source: WORKSPACE
             base_parameters:
               catalog: "${var.catalog}"
-            source: WORKSPACE
-          job_cluster_key: serverless_job_compute
+          environment_key: default
 
         - task_key: Gold_Layer_station_summary
           depends_on:
             - task_key: Silver_Layer
           notebook_task:
             notebook_path: ../citibike_etl/notebooks/03_gold/gold_citibike_daily_station_summary.ipynb
+            source: WORKSPACE
             base_parameters:
               catalog: "${var.catalog}"
-            source: WORKSPACE
-          job_cluster_key: serverless_job_compute
-          
+          environment_key: default
+
+      environments:
+              - environment_key: default
+                spec:
+                  environment_version: "2"
+
       queue:
         enabled: true
