@@ -35,7 +35,7 @@ jobs:
 
       - name: Create Databricks configuration profile file instead of CLI Command
         run: |
-          echo "[PROD]" > ~/.databrickscfg
+          echo "[prod]" > ~/.databrickscfg
           echo "host = ${{ secrets.HOST }}" >> ~/.databrickscfg
           echo "azure_tenant_id = ${{secrets.AZURE_TENANT_ID}}" >> ~/.databrickscfg
           echo "azure_client_id = ${{secrets.AZURE_CLIENT_ID}}" >> ~/.databrickscfg
@@ -48,6 +48,6 @@ jobs:
       - name: Deploy To Prod
         run: |
           databricks bundle deploy \
-          --target PROD \
-          --profile PROD
+          --target prod \
+          --profile prod
       
