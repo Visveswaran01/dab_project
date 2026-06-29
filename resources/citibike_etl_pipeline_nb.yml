@@ -2,6 +2,13 @@ resources:
   jobs:
     citibike_etl_pipeline_nb:
       name: citibike_etl_pipeline_nb
+      
+      # 1. Define a modern, standard Job Cluster block but leave it completely empty ({})
+      # This explicitly tells the API backend to route everything to pure Serverless infra.
+      job_clusters:
+        - job_cluster_key: serverless_job_compute
+          new_cluster: {}
+
       tasks:
         - task_key: Bronze_Layer
           notebook_task:
@@ -13,8 +20,8 @@ resources:
               processed_at: "{{job.start_time.iso_datetime}}"
               catalog: "${var.catalog}"
             source: WORKSPACE
-          # Force Serverless by declaring an empty new_cluster block
-          new_cluster: {}
+          # 2. Point your task to the empty cluster configuration key
+          job_cluster_key: serverless_job_compute
 
         - task_key: Silver_Layer
           depends_on:
@@ -28,7 +35,7 @@ resources:
               processed_at: "{{job.start_time.iso_datetime}}"
               catalog: "${var.catalog}"
             source: WORKSPACE
-          new_cluster: {}
+          job_cluster_key: serverless_job_compute
 
         - task_key: Gold_Layer_daily_summary
           depends_on:
@@ -38,7 +45,7 @@ resources:
             base_parameters:
               catalog: "${var.catalog}"
             source: WORKSPACE
-          new_cluster: {}
+          job_cluster_key: serverless_job_compute
 
         - task_key: Gold_Layer_station_summary
           depends_on:
@@ -48,6 +55,7 @@ resources:
             base_parameters:
               catalog: "${var.catalog}"
             source: WORKSPACE
-          new_cluster: {}
+          job_cluster_key: serverless_job_compute
+          
       queue:
         enabled: true
