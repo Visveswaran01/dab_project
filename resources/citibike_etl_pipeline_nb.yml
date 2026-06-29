@@ -1,0 +1,49 @@
+resources:
+  jobs:
+    citibike_etl_pipeline_nb:
+      name: citibike_etl_pipeline_nb
+      tasks:
+        - task_key: Bronze_Layer
+          notebook_task:
+            notebook_path: ../citibike_etl/notebooks/01_bronze/bronze_citibike.ipynb
+            base_parameters:
+              pipelineid: "{{job.id}}"
+              runid: "{{job.run_id}}"
+              task_id: "{{task.run_id}}"
+              processed_at: "{{job.start_time.iso_datetime}}"
+              catalog: "${var.catalog}"
+            source: WORKSPACE
+          existing_cluster_id: 0622-191418-q3j4m6y3
+        - task_key: Silver_Layer
+          depends_on:
+            - task_key: Bronze_Layer
+          notebook_task:
+            notebook_path: ../citibike_etl/notebooks/02_silver/silver_citibike.ipynb
+            base_parameters:
+              pipelineid: "{{job.id}}"
+              runid: "{{job.run_id}}"
+              task_id: "{{task.run_id}}"
+              processed_at: "{{job.start_time.iso_datetime}}"
+              catalog: "${var.catalog}"
+            source: WORKSPACE
+          existing_cluster_id: 0622-191418-q3j4m6y3
+        - task_key: Gold_Layer_daily_summary
+          depends_on:
+            - task_key: Silver_Layer
+          notebook_task:
+            notebook_path: ../citibike_etl/notebooks/03_gold/gold_citibike_daily_ride_summary.ipynb
+            base_parameters:
+              catalog: "${var.catalog}"
+            source: WORKSPACE
+          existing_cluster_id: 0622-191418-q3j4m6y3
+        - task_key: Gold_Layer_station_summary
+          depends_on:
+            - task_key: Silver_Layer
+          notebook_task:
+            notebook_path: ../citibike_etl/notebooks/03_gold/gold_citibike_daily_station_summary.ipynb
+            base_parameters:
+              catalog: "${var.catalog}"
+            source: WORKSPACE
+          existing_cluster_id: 0622-191418-q3j4m6y3
+      queue:
+        enabled: true
